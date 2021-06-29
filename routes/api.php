@@ -22,7 +22,4 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::namespace('Api')->prefix('v1')->middleware('cors')->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
-    Route::get('/users/{user}', [UserController::class, 'show'])->name('users.show');
-    Route::post('/users', [UserController::class, 'store'])->name('users.store');
-    Route::post('/login', [UserController::class, 'login'])->name('users.login');
 });

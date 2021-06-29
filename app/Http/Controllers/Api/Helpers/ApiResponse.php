@@ -4,124 +4,100 @@
 namespace App\Http\Controllers\Api\Helpers;
 
 
+use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as FoundationResponse;
 use Illuminate\Support\Facades\Response;
 
 trait ApiResponse
 {
     protected $statusCode = FoundationResponse::HTTP_OK;
-    protected $status = "success";
-    protected $data = array();
+    protected $data = [];
     protected $errorCode = 0;
-    protected $errorMessage = "Undefined error!";
+    protected $errorMessage = "ok";
     protected $headers = [];
 
-    public function setStatus($status)
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    public function setStatusCode($statusCode)
+    public function setStatusCode($statusCode): ApiResponse
     {
         $this->statusCode = $statusCode;
         return $this;
     }
 
-    public function setErrorCode($errorCode)
+    public function setErrorCode($errorCode): ApiResponse
     {
         $this->errorCode = $errorCode;
         return $this;
     }
 
-    public function setErrorMessage($errorMessage)
+    public function setErrorMessage($errorMessage): ApiResponse
     {
         $this->errorMessage = $errorMessage;
         return $this;
     }
 
-    public function setData($data)
+    public function setData($data): ApiResponse
     {
         $this->data = $data;
         return $this;
     }
 
-    public function response()
+    public function response(): JsonResponse
     {
         $body = [
-            "status" => $this->status
+            "err_code" => $this->errorCode,
+            "err_msg" => $this->errorMessage
         ];
-        if ($this->status != "error") {
-            $body["data"] = $this->data;
-        } else {
-            $body["err_code"] = $this->errorCode;
-            $body["err_msg"] = $this->errorMessage;
+        if ($this->errorCode == 0) {
+//            $body["data"] = $this->data;
+            $body = array_merge($body, $this->data);
         }
         return Response::json($body, $this->statusCode, $this->headers);
     }
 
-    public function success($data = null, $status = "success")
+    public function success($data = []): JsonResponse
     {
         return $this->setStatusCode(FoundationResponse::HTTP_OK)
-            ->setStatus($status)
+            ->setErrorCode(0)
+            ->setErrorMessage('ok')
             ->setData($data)
             ->response();
     }
 
-//    public function created($url = "", $status = "success")
-//    {
-//        $tmp = $this->setStatusCode(FoundationResponse::HTTP_CREATED)
-//            ->setStatus($status);
-//        if (!empty($url)) {
-//            $tmp = $tmp->setData(['url' => $url]);
-//        }
-//        return $tmp->response();
-//    }
-
-//    public function deleted($status = "success")
-//    {
-//        return $this->setStatusCode(FoundationResponse::HTTP_NO_CONTENT)
-//            ->setStatus($status)
-//            ->response();
-//    }
-
-    public function failed($errorCode, $errorMessage, $statusCode = FoundationResponse::HTTP_BAD_REQUEST, $status = 'error')
+    public function failed($errorCode, $errorMessage): JsonResponse
     {
-        return $this->setStatusCode($statusCode)
-            ->setStatus($status)
+        return $this->setStatusCode(FoundationResponse::HTTP_OK)
             ->setErrorCode($errorCode)
             ->setErrorMessage($errorMessage)
             ->response();
     }
 
-    public function missParameters ($errorMessage = "缺少参数!")
+    public function missParameters ($errorMessage = "Miss parameters!"): JsonResponse
     {
         return $this->failed(Errors::BAD_REQUEST, $errorMessage);
     }
 
-    public function notFound($errorCode = Errors::NOT_FOUND, $errorMessage = "Not found!")
+    public function notFound($errorCode = Errors::NOT_FOUND, $errorMessage = "Not found!"): JsonResponse
     {
-        return $this->failed($errorCode, $errorMessage, FoundationResponse::HTTP_NOT_FOUND);
+        return $this->failed($errorCode, $errorMessage);
     }
 
-    public function internalError($errorCode = Errors::INTERNAL_SERVER_ERROR, $errorMessage = "Internal error!")
+    public function internalError($errorCode = Errors::INTERNAL_SERVER_ERROR, $errorMessage = "Internal error!"): JsonResponse
     {
-        return $this->failed($errorCode, $errorMessage, FoundationResponse::HTTP_INTERNAL_SERVER_ERROR);
+        return $this->failed($errorCode, $errorMessage);
     }
 
-    public function unauthorized($errorCode = Errors::UNAUTHORIZED, $errorMessage = "Unauthorized!")
+    public function unauthorized($errorCode = Errors::UNAUTHORIZED, $errorMessage = "Unauthorized!"): JsonResponse
     {
-        return $this->failed($errorCode, $errorMessage, FoundationResponse::HTTP_UNAUTHORIZED);
+        return $this->failed($errorCode, $errorMessage);
     }
 
-    public function forbidden($errorCode = Errors::FORBIDDEN, $errorMessage = "Permission denied!")
+    public function forbidden($errorCode = Errors::FORBIDDEN, $errorMessage = "Permission denied!"): JsonResponse
     {
-        return $this->failed($errorCode, $errorMessage, FoundationResponse::HTTP_FORBIDDEN);
+        return $this->failed($errorCode, $errorMessage);
     }
 
-    public function conflict($errorCode = Errors::CONFLICT, $errorMessage = "Conflict!")
+    public function conflict($errorCode = Errors::CONFLICT, $errorMessage = "Conflict!"): JsonResponse
     {
-        return $this->failed($errorCode, $errorMessage, FoundationResponse::HTTP_CONFLICT);
+        return $this->failed($errorCode, $errorMessage);
     }
 
 }
