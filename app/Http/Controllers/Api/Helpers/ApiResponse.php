@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Api\Helpers;
 
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\JsonResponse;
 use Symfony\Component\HttpFoundation\Response as FoundationResponse;
 use Illuminate\Support\Facades\Response;
@@ -36,7 +37,12 @@ trait ApiResponse
 
     public function setData($data): ApiResponse
     {
-        $this->data = $data;
+        if ($data instanceof Arrayable) {
+            $this->data = $data->toArray();
+        } else {
+            $this->data = $data;
+        }
+
         return $this;
     }
 
