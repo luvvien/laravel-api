@@ -4,22 +4,14 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 
-class User extends Authenticatable
+class BaseModel extends Model
 {
-    use HasFactory, Notifiable;
+    use HasFactory;
 
     public $timestamps = true;
-
-    protected $fillable = [
-        'nickname',
-        'phone',
-        'avatar_url',
-        'gender'
-    ];
-
+    protected $fillable = [];
     protected $hidden = ['updated_at'];
 
     public function getCreatedAtAttribute () {
